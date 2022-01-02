@@ -42,7 +42,32 @@ bool isFire = false;
 bool isFireComplete = true;
 
 BOOL done = FALSE;								// Bool Variable To Exit Loop
+bool win = true;
+bool up;
+bool dn;
+bool rn;
+bool esc;
+bool DONE = false;
+bool MENU = false;
+int item = 1;
+bool Selection = false;
+bool PlayAgain = false;
+bool Options = false;
+bool Exit = false;
 
+//int cntclr = 0;
+
+float alpha1 = .25f;
+float alpha2 = .25f;
+float alpha3 = .25f;
+float alpha1a = 0;
+float alpha2a = 0;
+float alpha3a = 0;
+float alpha1ap = 0;
+float alpha2ap = 0;
+float alpha3ap = 0;
+
+float menuZ = 0;
 
 
 int loop;
@@ -56,7 +81,7 @@ Model_3DS*tree3;
 Model_3DS*ANT;
 
 GLUquadricObj *quadratic;	// Storage For Our Quadratic Objects ( NEW )
-GLuint	texture[3];
+GLuint	texture[30];
 LRESULT	CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);	// Declaration For WndProc
 GLvoid KillGLWindow(GLvoid);
 
@@ -140,7 +165,7 @@ GLdouble fire_delay = 0;
 
 int shots_fired = 0;
 
-
+bool notdie[50];
 
 class Room {
 
@@ -148,7 +173,7 @@ class Room {
 public:
 	Motherboard mbModel;
 	PowerSupply psModel;
-	bool notdie[50];
+	
 	Room() {
 		for (int i = 0; i < 50; i++)
 			notdie[i] = true;
@@ -448,6 +473,47 @@ public:
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
 			gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB8, TextureImage[0]->sizeX, TextureImage[0]->sizeY, GL_RGB, GL_UNSIGNED_BYTE, TextureImage[0]->data);
+		}
+
+		if (TextureImage[0] = LoadBMP("texture/PlayAgain.bmp"))//data/bricksred.bmp")) //"Data/Wall.bmp"))
+		{
+			Status = TRUE;									// Set The Status To TRUE
+
+			glGenTextures(1, &texture[18]);					// Create Three Textures
+
+															// Create MipMapped Texture
+			glBindTexture(GL_TEXTURE_2D, texture[18]);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+			gluBuild2DMipmaps(GL_TEXTURE_2D, 3, TextureImage[0]->sizeX, TextureImage[0]->sizeY, GL_RGB, GL_UNSIGNED_BYTE, TextureImage[0]->data);
+		}
+
+		if (TextureImage[0])								// If Texture Exists
+		{
+			if (TextureImage[0]->data)						// If Texture Image Exists
+			{
+				free(TextureImage[0]->data);				// Free The Texture Image Memory
+			}
+
+			free(TextureImage[0]);							// Free The Image Structure
+		}
+
+		// Load The Bitmap, Check For Errors, If Bitmap's Not Found Quit
+
+
+
+		// Load The Bitmap, Check For Errors, If Bitmap's Not Found Quit
+		if (TextureImage[0] = LoadBMP("texture/Exit.bmp"))//data/bricksred.bmp")) //"Data/Wall.bmp"))
+		{
+			Status = TRUE;									// Set The Status To TRUE
+
+			glGenTextures(1, &texture[19]);					// Create Three Textures
+
+															// Create MipMapped Texture
+			glBindTexture(GL_TEXTURE_2D, texture[19]);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+			gluBuild2DMipmaps(GL_TEXTURE_2D, 3, TextureImage[0]->sizeX, TextureImage[0]->sizeY, GL_RGB, GL_UNSIGNED_BYTE, TextureImage[0]->data);
 		}
 		//// Texture for CPU upper layer
 
@@ -799,6 +865,8 @@ public:
 
 
 	void isdie(GLdouble x, GLdouble y, GLdouble z) {
+		if (ytrans2>0 && ytrans2<1000)
+
 		if (y >= 0 && y <= 10) {
 			if (x > 110 && x < 130 && z>190 && z < 210)
 				notdie[0] = false;
@@ -817,6 +885,7 @@ public:
 		}
 
 		if (y >= 0 && y <= 10) {
+			if (ytrans2>1000 && ytrans2<2000)
 
 			if (x > 110 && x < 130 && z>190 && z < 210)
 				notdie[6] = false;
@@ -945,6 +1014,9 @@ public:
 		glEndList();
 	}
 	/*تابع الاصتدام الي يعالج داخله كل الحالات*/
+
+
+
 	inline bool DetectCollision(GLdouble &cx, GLdouble &cy, GLdouble &cz, GLdouble padding)
 	{
 		bool Status = false;
@@ -1017,52 +1089,59 @@ public:
 			Status = true;
 		}
 
-		/*      معالجة صدم بال cpu*/
-		if (cy >= 0 && cy < 999) {
-			if (cx < MAX_Cells / 2 + 26 + padding && cx > MAX_Cells / 2 - 26 - padding && cz < MAX_Cells / 2 + 26 + padding && cz > MAX_Cells / 2 - 26 - padding /*&& cy < 8+padding && cy > 6-padding*/)
-			{
-				if (cx < MAX_Cells / 2 + 26 + padding && cx > MAX_Cells / 2 + 25.75f - padding)
-				{
-					cx = MAX_Cells / 2 + 26 + padding;
-
-				}
-				else if (cx > MAX_Cells / 2 - 26 - padding && cx < MAX_Cells / 2 - 25.75f + padding)
-				{
-					cx = MAX_Cells / 2 - 26 - padding;
-					;
-				}
 
 
-				if (cy < 8 + padding && cy > 7.75f - padding)
-				{
-
-				}
-				else if (cy > 6 - padding && cy < 6.25f + padding)
-				{
-
-				}
-
-				if (cz < MAX_Cells / 2 + 26 + padding && cz > MAX_Cells / 2 + 25.75f - padding)
-				{
-					cz = MAX_Cells / 2 + 26 + padding;
-
-				}
-				else if (cz > MAX_Cells / 2 - 26 - padding && cz < MAX_Cells / 2 - 25.75f + padding)
-				{
-					cz = MAX_Cells / 2 - 26 - padding;
-
-				}
-
-				Status = true;
-			}
-
-
-
-
-		}
 		return Status;
 	}
+	/*
+	cx,cy,cz موقعك بالكاميرا
+	px,pz (المركز)موقع الجسم
+	sx,sz طول الجسم و عرضه
+	padding بعدك عن الجسم منشان ما تصير قريب من الجسم
+	*/
+	/*inline bool DetectCollision2(GLdouble &cx, GLdouble &cy, GLdouble &cz, GLdouble padding )
+	{
+	bool Status = false;
+	if (cx > MAX_Cells2-padding)
+	{
+	cx = MAX_Cells2-padding;
 
+	Status = true;
+	}
+	else if (cx < 0+padding)
+	{
+	cx = 0+padding;
+
+	Status = true;
+	}
+
+	/*if (cy > MAX_Cells/4-padding)
+	{
+	cy = MAX_Cells/4-padding;
+
+	Status = true;
+	}
+	else if (cy < 0+padding)
+	{
+	cy = 0+padding;
+
+	Status = true;
+	}*/
+
+	/* if (cz > MAX_Cells2-padding)
+	{
+	cz = MAX_Cells2-padding;
+
+	Status = true;
+	}
+	else if (cz < 0+padding)
+	{
+	cz = 0+padding;
+
+	Status = true;
+	}
+	}
+	*/
 
 	// This collision detextion code for layer 1
 	inline bool DetectCollisionitem1(GLdouble &cx, GLdouble &cy, GLdouble &cz, GLdouble px, GLdouble pz, GLdouble sx, GLdouble sz, GLdouble padding) {
@@ -1232,10 +1311,12 @@ public:
 	inline bool DetectCollisionitems() {
 		int padding = 5;
 		bool Status = false;
-		DetectCollisionitem1(xtrans2, ytrans2, ztrans2, 220, 115, 70, 20, padding);
-		DetectCollisionitem1(xtrans2, ytrans2, ztrans2, 220, 415, 70, 20, padding);
+		DetectCollisionitem1(xtrans2, ytrans2, ztrans2, 220, 115, 90, 18, padding);
+		DetectCollisionitem1(xtrans2, ytrans2, ztrans2, 220, 390, 90, 20, padding);
 		DetectCollisionitem1(xtrans2, ytrans2, ztrans2, 120, 250, 20, 10, padding);
 		DetectCollisionitem1(xtrans2, ytrans2, ztrans2, 450, 250, 20, 10, padding);
+		DetectCollisionitem1(xtrans2, ytrans2, ztrans2, 256, 256, 40, 40, padding);
+
 
 
 		if (notdie[0])
@@ -1283,6 +1364,95 @@ public:
 
 	}
 
+
+
+
+	void Menu()
+	{
+		if (PlayAgain)
+		{
+			alpha1 += .025f;
+			alpha2 -= .010f;
+			alpha3 -= .010f;
+			if (alpha1 >   .75f) alpha1 = .75f;
+			if (alpha2 < .5f) alpha2 = .5f;
+			if (alpha3 < .5f) alpha3 = .5f;
+			alpha1ap += .5f - alpha1a;
+			alpha1a += alpha1ap / 250;
+			alpha2a = 0; alpha2ap = 0; alpha3a = 0; alpha3ap = 0;
+		}
+		else if (Options)
+		{
+			alpha1 -= .010f;
+			alpha2 += .025f;
+			alpha3 -= .010f;
+			if (alpha1 < .5f) alpha1 = .5f;
+			if (alpha2 >  .75f) alpha2 = .75f;
+			if (alpha3 < .5f) alpha3 = .5f;
+			alpha2ap += .5f - alpha2a;
+			alpha2a += alpha2ap / 250;
+			alpha1a = 0; alpha1ap = 0; alpha3a = 0; alpha3ap = 0;
+		}
+		else if (Exit)
+		{
+			alpha1 -= .010f;
+			alpha2 -= .010f;
+			alpha3 += .025f;
+			if (alpha1 < .5f) alpha1 = .5f;
+			if (alpha2 < .5f) alpha2 = .5f;
+			if (alpha3 > .75f) alpha3 = .75f;
+			alpha3ap += .5f - alpha3a;
+			alpha3a += alpha3ap / 250;
+			alpha1a = 0; alpha1ap = 0; alpha2a = 0; alpha2ap = 0;
+		}
+
+		glEnable(GL_BLEND);
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_LIGHTING);
+
+		int scalemenu = 2;
+
+		menuZ -= .1;
+		if (menuZ < -9) menuZ = -9;
+
+		glLoadIdentity();
+		glTranslatef(0, 0, menuZ - 1);
+
+
+
+		glBindTexture(GL_TEXTURE_2D, texture[18]);
+		glColor4f(1, 1, 1, (alpha1 + alpha1a) / 2);
+		glBegin(GL_TRIANGLE_STRIP);
+		glTexCoord2f(1, 1); glVertex3f(1.0*scalemenu, (.4 + .4)*scalemenu, 0);
+		glTexCoord2f(1, 0); glVertex3f(1.0*scalemenu, .4*scalemenu, 0);
+		glTexCoord2f(0, 1); glVertex3f(-1.0*scalemenu, (.4 + .4)*scalemenu, 0);
+		glTexCoord2f(0, 0); glVertex3f(-1.0*scalemenu, .4*scalemenu, 0);
+		glEnd();
+
+
+		glBindTexture(GL_TEXTURE_2D, texture[6]);
+		glColor4f(1, 1, 1, (alpha2 + alpha2a) / 2);
+		glBegin(GL_TRIANGLE_STRIP);
+		glTexCoord2f(1, 1); glVertex3f(1.0*scalemenu, .4*scalemenu, 0);
+		glTexCoord2f(1, 0); glVertex3f(1.0*scalemenu, 0, 0);
+		glTexCoord2f(0, 1); glVertex3f(-1.0*scalemenu, .4*scalemenu, 0);
+		glTexCoord2f(0, 0); glVertex3f(-1.0*scalemenu, 0, 0);
+		glEnd();
+
+
+
+		glBindTexture(GL_TEXTURE_2D, texture[19]);
+		glColor4f(1, 1, 1, (alpha3 + alpha3a) / 2);
+		glBegin(GL_TRIANGLE_STRIP);
+		glTexCoord2f(1, 1); glVertex3f(1.0*scalemenu, (.4 - .4)*scalemenu, 0);
+		glTexCoord2f(1, 0); glVertex3f(1.0*scalemenu, (0 - .4)*scalemenu, 0);
+		glTexCoord2f(0, 1); glVertex3f(-1.0*scalemenu, (.4 - .4)*scalemenu, 0);
+		glTexCoord2f(0, 0); glVertex3f(-1.0*scalemenu, (0 - .4)*scalemenu, 0);
+		glEnd();
+
+
+		glEnable(GL_DEPTH_TEST);
+	}
 
 
 
@@ -1458,7 +1628,6 @@ inline int DrawGLScene(GLvoid)									// Here's Where We Do All The Drawing
 		fire_z += fire_zp;
 
 		obj.isdie(fire_x, fire_y, fire_z);
-		std::cout << fire_y;
 		if (obj.DetectCollision(fire_x, fire_y, fire_z, 0))
 		{
 			isFireComplete = true;
@@ -1882,146 +2051,216 @@ int WINAPI WinMain(HINSTANCE	hInstance,			// Instance
 			}
 			else									// Not Time To Quit, Update Screen
 			{
+
+				if ((!notdie[0] && !notdie[1] && !notdie[2] && !notdie[3] && !notdie[4] && !notdie[5] && !notdie[6] && !notdie[7] && !notdie[8] && !notdie[9]))
+					MENU = true;
+				if (MENU) {
+					if (win)
+						PlaySound("YouWin.wav", NULL, SND_ASYNC | SND_FILENAME);
+					obj.Menu();
+					win = false;
+				}
 				SwapBuffers(hDC);					// Swap Buffers (Double Buffering)
 
 				is_Fired--;
 				if (is_Fired < 0) is_Fired = 0;
-
-				if (keys[VK_UP])  // Move forwards
+				if (MENU)
 				{
-					if (ytrans2 > 1999 && ytrans2 < 2999) {
-						XP -= (GLdouble)sin(heading*piover180) * 2.5f;
-						ZP -= (GLdouble)cos(heading*piover180) * 2.5f;
-					}
-					else {
 
-						XP -= (GLdouble)sin(heading*piover180) * 5.0f;
-						ZP -= (GLdouble)cos(heading*piover180) * 5.0f;
-					}
-				}
-				else if (keys['W'])  // Move forwards
-				{
-					if (ytrans2 > 1999 && ytrans2 < 2999) {
-						XP -= (GLdouble)sin(heading*piover180) * 2.5f;
-						ZP -= (GLdouble)cos(heading*piover180) * 2.5f;
-					}
-					else {
-						XP -= (GLdouble)sin(heading*piover180) * 5.0f;
-						ZP -= (GLdouble)cos(heading*piover180) * 5.0f;
-					}
-				}
-
-				if (keys[VK_DOWN]) // Move backwards
-				{
-					if (ytrans2 > 1999 && ytrans2 < 2999) {
-						XP += (GLdouble)sin(heading*piover180) * 2.5f;
-						ZP += (GLdouble)cos(heading*piover180) * 2.5f;
-					}
-					else {
-
-						XP += (GLdouble)sin(heading*piover180) * 5.0f;
-						ZP += (GLdouble)cos(heading*piover180) * 5.0f;
-					}
-				}
-				else if (keys['S']) // Move backwards
-				{
-					if (ytrans2 > 1999 && ytrans2 < 2999) {
-						XP += (GLdouble)sin(heading*piover180) * 2.5f;
-						ZP += (GLdouble)cos(heading*piover180) * 2.5f;
-					}
-					else {
-
-						XP += (GLdouble)sin(heading*piover180) * 5.0f;
-						ZP += (GLdouble)cos(heading*piover180) * 5.0f;
-					}
-				}
-
-				if (keys['A'])  // strafe left
-				{
-					if (ytrans2 > 1999 && ytrans2 < 2999) {
-						XP += (GLdouble)sin((heading - 90)*piover180) * 2.5f;
-						ZP += (GLdouble)cos((heading - 90)*piover180) * 2.5f;
-					}
-					else {
-
-						XP += (GLdouble)sin((heading - 90)*piover180) * 5.0f;
-						ZP += (GLdouble)cos((heading - 90)*piover180) * 5.0f;
-					}
-				}
-
-				if (keys['D']) // strafe right
-				{
-					if (ytrans2 > 1999 && ytrans2 < 2999) {
-						XP += (GLdouble)sin((heading + 90)*piover180) * 2.5f;
-						ZP += (GLdouble)cos((heading + 90)*piover180) * 2.5f;
-					}
-					else {
-
-						XP += (GLdouble)sin((heading + 90)*piover180) * 5.0f;
-						ZP += (GLdouble)cos((heading + 90)*piover180) * 5.0f;
-					}
-				}
-
-				if (keys['1'])   // cpu
-				{
-					xtrans2 = MAX_Cells / 3;
-					ztrans2 = MAX_Cells / 1.5f;
-					ytrans2 = 10;
-				}
-
-				if (keys['2']) // motherboard
-				{
-					xtrans2 = MAX_Cells *0.25;
-					ztrans2 = MAX_Cells *0.25f;
-					ytrans2 = 1010;
-
-				}
-				if (keys['3'])  // ps
-				{
-					xtrans2 = MAX_Cells / 3;
-					ztrans2 = MAX_Cells / 1.5f;
-					ytrans2 = 2010;
-				}
-				if (keys['4'])  // monitor
-				{
-					xtrans2 = MAX_Cells / 3;
-
-					ztrans2 = MAX_Cells / 1.5f;
-					ytrans2 = 3010;
-				}
-				if (keys['5'])  // ram
-				{
-					xtrans2 = MAX_Cells / 3;
-
-					ztrans2 = MAX_Cells / 1.5f;
-					ytrans2 = 4010;
-				}
-
-
-				if (keys[VK_SPACE])
-				{
-					if (is_Fired == 0)
+					if (keys[VK_UP] && !up)
 					{
-						is_Fired = 7;  // 1 shot every 7 frames.
-						isFire = true;
+						PlaySound("type.wav", NULL, SND_ASYNC);
+						up = true;
+						item--;
+						if (item < 1) item = 3;
 					}
-					else if ((is_shock_rifle))
+					if (!keys[VK_UP])
 					{
-						isFire = true;
+						up = false;
 					}
-				}
+					if (keys[VK_DOWN] && !dn)
+					{
+						PlaySound("type.wav", NULL, SND_ASYNC);
+						dn = true;
+						item++;
+						if (item > 3) item = 1;
+					}
+					if (!keys[VK_DOWN])
+					{
+						dn = false;
+					}
+					if (keys[VK_RETURN])
+					{
+						rn = true;
+						Selection = true;
+						if (PlayAgain) {
+							xtrans2 = MAX_Cells *0.6 - 20;
+							ytrans2 = 10;
+							ztrans2 = MAX_Cells *0.4 - 20;
+							MENU = !MENU;
+							for (int i = 0; i < 10; i++)notdie[i] = true;
+						}
 
-				if (keys[VK_LEFT]) // Turn left
+						else if (Exit)
+							done = true;
+						else if (Options)
+							MENU = !MENU;
+
+						win = true;
+					}
+					if (!keys[VK_RETURN])
+					{
+						rn = false;
+					}
+
+
+					switch (item)
+					{
+					case 1: PlayAgain = true, Options = false, Exit = false; break;
+					case 2: PlayAgain = true, Options = false, Exit = false; break;
+					case 3: PlayAgain = false, Options = false, Exit = true; break;
+					}
+
+					//SwapBuffers(hDC);					// Swap Buffers (Double Buffering)
+
+				}
+				else
 				{
-					zprot += .5f;
+					if (keys[VK_UP])  // Move forwards
+					{
+						if (ytrans2 > 1999 && ytrans2 < 2999) {
+							XP -= (GLdouble)sin(heading*piover180) * 2.5f;
+							ZP -= (GLdouble)cos(heading*piover180) * 2.5f;
+						}
+						else {
+
+							XP -= (GLdouble)sin(heading*piover180) * 5.0f;
+							ZP -= (GLdouble)cos(heading*piover180) * 5.0f;
+						}
+					}
+					else if (keys['W'])  // Move forwards
+					{
+						if (ytrans2 > 1999 && ytrans2 < 2999) {
+							XP -= (GLdouble)sin(heading*piover180) * 2.5f;
+							ZP -= (GLdouble)cos(heading*piover180) * 2.5f;
+						}
+						else {
+							XP -= (GLdouble)sin(heading*piover180) * 5.0f;
+							ZP -= (GLdouble)cos(heading*piover180) * 5.0f;
+						}
+					}
+
+					if (keys[VK_DOWN]) // Move backwards
+					{
+						if (ytrans2 > 1999 && ytrans2 < 2999) {
+							XP += (GLdouble)sin(heading*piover180) * 2.5f;
+							ZP += (GLdouble)cos(heading*piover180) * 2.5f;
+						}
+						else {
+
+							XP += (GLdouble)sin(heading*piover180) * 5.0f;
+							ZP += (GLdouble)cos(heading*piover180) * 5.0f;
+						}
+					}
+					else if (keys['S']) // Move backwards
+					{
+						if (ytrans2 > 1999 && ytrans2 < 2999) {
+							XP += (GLdouble)sin(heading*piover180) * 2.5f;
+							ZP += (GLdouble)cos(heading*piover180) * 2.5f;
+						}
+						else {
+
+							XP += (GLdouble)sin(heading*piover180) * 5.0f;
+							ZP += (GLdouble)cos(heading*piover180) * 5.0f;
+						}
+					}
+
+					if (keys['A'])  // strafe left
+					{
+						if (ytrans2 > 1999 && ytrans2 < 2999) {
+							XP += (GLdouble)sin((heading - 90)*piover180) * 2.5f;
+							ZP += (GLdouble)cos((heading - 90)*piover180) * 2.5f;
+						}
+						else {
+
+							XP += (GLdouble)sin((heading - 90)*piover180) * 5.0f;
+							ZP += (GLdouble)cos((heading - 90)*piover180) * 5.0f;
+						}
+					}
+
+					if (keys['D']) // strafe right
+					{
+						if (ytrans2 > 1999 && ytrans2 < 2999) {
+							XP += (GLdouble)sin((heading + 90)*piover180) * 2.5f;
+							ZP += (GLdouble)cos((heading + 90)*piover180) * 2.5f;
+						}
+						else {
+
+							XP += (GLdouble)sin((heading + 90)*piover180) * 5.0f;
+							ZP += (GLdouble)cos((heading + 90)*piover180) * 5.0f;
+						}
+					}
+
+					if (keys['1'])   // cpu
+					{
+						xtrans2 = MAX_Cells / 3;
+						ztrans2 = MAX_Cells / 1.5f;
+						ytrans2 = 10;
+					}
+
+					if (keys['2']) // motherboard
+					{
+						xtrans2 = MAX_Cells *0.25;
+						ztrans2 = MAX_Cells *0.25f;
+						ytrans2 = 1010;
+
+					}
+					if (keys['3'])  // ps
+					{
+						xtrans2 = MAX_Cells / 3;
+						ztrans2 = MAX_Cells / 1.5f;
+						ytrans2 = 2010;
+					}
+					if (keys['4'])  // monitor
+					{
+						xtrans2 = MAX_Cells / 3;
+
+						ztrans2 = MAX_Cells / 1.5f;
+						ytrans2 = 3010;
+					}
+					if (keys['5'])  // ram
+					{
+						xtrans2 = MAX_Cells / 3;
+
+						ztrans2 = MAX_Cells / 1.5f;
+						ytrans2 = 4010;
+					}
+
+
+					if (keys[VK_SPACE])
+					{
+						if (is_Fired == 0)
+						{
+							is_Fired = 7;  // 1 shot every 7 frames.
+							isFire = true;
+						}
+						else if ((is_shock_rifle))
+						{
+							isFire = true;
+						}
+					}
+
+					if (keys[VK_LEFT]) // Turn left
+					{
+						zprot += .5f;
+					}
+					else if (keys[VK_RIGHT]) // Turn right
+					{
+						zprot -= .5f;
+					}
+
+
 				}
-				else if (keys[VK_RIGHT]) // Turn right
-				{
-					zprot -= .5f;
-				}
-
-
-
 			}
 		}
 	}
